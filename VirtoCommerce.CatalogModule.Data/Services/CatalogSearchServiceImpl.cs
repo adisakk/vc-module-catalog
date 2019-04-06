@@ -231,6 +231,12 @@ namespace VirtoCommerce.CatalogModule.Data.Services
                 // Build the query based on the search criteria
                 var query = BuildSearchQuery(repository.Items, criteria, searchCategoryIds);
 
+                // Filter by creator name for only owner can see their product
+                if (criteria.CreatedBy != null)
+                {
+                    query = query.Where(x => x.CreatedBy == criteria.CreatedBy);
+                }
+
                 result.ProductsTotalCount = query.Count();
 
                 query = query.OrderBySortInfos(sortInfos);
