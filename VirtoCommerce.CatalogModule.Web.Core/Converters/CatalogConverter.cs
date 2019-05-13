@@ -17,7 +17,9 @@ namespace VirtoCommerce.CatalogModule.Web.Converters
                 Id = catalog.Id,
                 Name = catalog.Name,
                 IsVirtual = catalog.IsVirtual,
-                Properties = new List<webModel.Property>()
+                Properties = new List<webModel.Property>(),
+                PendingApprovalCount = catalog.PendingApprovalCount,
+                RejectedCount = catalog.RejectedCount
             };
 
             if (catalog.Languages != null)

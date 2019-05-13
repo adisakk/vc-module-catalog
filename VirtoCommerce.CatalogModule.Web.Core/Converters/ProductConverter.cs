@@ -52,6 +52,13 @@ namespace VirtoCommerce.CatalogModule.Web.Converters
 
             retVal.SeoInfos = product.SeoInfos;
 
+            retVal.PendingApprovalCount = product.PendingApprovalCount;
+            retVal.IsPendingApproval = product.IsPendingApproval;
+            retVal.IsApproved = product.IsApproved;
+            retVal.IsRejected = product.IsRejected;
+            retVal.RejectedCount = product.RejectedCount;
+            retVal.RejectionReason = product.RejectionReason;
+
             if (!product.Outlines.IsNullOrEmpty())
             {
                 //Minimize outline size

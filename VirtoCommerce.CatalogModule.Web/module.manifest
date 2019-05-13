@@ -127,6 +127,7 @@
             <permission id="catalog:export" name="Export catalog data" description=""/>
             <permission id="catalog:import" name="Import catalog data" description=""/>
             <permission id="catalog:imagetypes" name="Manage image types" description=""/>
+            <permission id="catalog:approve" name="Approve product in catalog" description=""/>
         </group>
     </permissions>
 </module>

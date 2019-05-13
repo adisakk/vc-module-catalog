@@ -28,6 +28,7 @@ namespace VirtoCommerce.CatalogModule.Web.Converters
             retVal.ModifiedBy = category.ModifiedBy;
             retVal.ModifiedDate = category.ModifiedDate;
             retVal.Priority = category.Priority;
+            retVal.PendingApprovalCount = category.PendingApprovalCount;
 
             retVal.SeoInfos = category.SeoInfos;
             if (!category.Outlines.IsNullOrEmpty())

@@ -1,4 +1,4 @@
-﻿<div class="blade-static" ng-if="blade.currentEntities.length">
+<div class="blade-static" ng-if="blade.currentEntities.length">
     <div class="form-group">
         <vc-item-search blade="blade"></vc-item-search>
         
@@ -45,11 +45,34 @@
     </div>
 </script>
 <script type="text/ng-template" id="list-name.cell.html">
+    <style type="text/css">
+        .fa-stack[data-count]:after {
+            position: absolute;
+            right: 20%;
+            top: 30%;
+            content: attr(data-count);
+            font-size: 30%;
+            padding: .6em;
+            border-radius: 999px;
+            line-height: .75em;
+            color: white;
+            background: rgba(255,0,0,.75);
+            text-align: center;
+            text-shadow: 1px 1px 2px #333;
+            min-width: .8em;
+            font-weight: bold;
+            width: auto;
+        }
+    </style>
+    
     <div class="ui-grid-cell-contents">
         <div class="inner-contents">
-            <i class="table-ico fa" ng-class="row.entity.isVirtual ? 'fa-cloud' : 'fa-folder'"></i>
+            <div ng-class="row.entity.pendingApprovalCount > 0 ? 'fa-stack fa-2x has-badge' : 'inner-contents'" data-count="{{row.entity.pendingApprovalCount}}">
+                <i class="table-ico fa" ng-class="row.entity.isVirtual ? 'fa-cloud' : 'fa-folder'"></i>
+            </div>
             <span class="table-t" ng-show="row.entity.isVirtual">{{ 'catalog.blades.catalogs-list.labels.virtual' | translate: { name: COL_FIELD } }}</span>
             <span class="table-t" ng-hide="row.entity.isVirtual">{{COL_FIELD}}</span>
+
         </div>
     </div>
 </script>

@@ -85,6 +85,11 @@ namespace VirtoCommerce.CatalogModule.Data.Model
 
         public int Priority { get; set; }
 
+        public bool IsPendingApproval { get; set; }
+        public bool IsApproved { get; set; }
+        public bool IsRejected { get; set; }
+        public string RejectionReason { get; set; }
+
         #region Navigation Properties
 
         public virtual ObservableCollection<CategoryItemRelationEntity> CategoryLinks { get; set; }
@@ -161,6 +166,13 @@ namespace VirtoCommerce.CatalogModule.Data.Model
             product.Weight = Weight;
             product.WeightUnit = WeightUnit;
             product.Width = Width;
+ 
+            product.IsPendingApproval = IsPendingApproval;
+            product.IsApproved = IsApproved;
+            product.IsRejected = IsRejected;
+            product.PendingApprovalCount = IsPendingApproval ? 1 : 0;
+            product.RejectedCount = IsRejected ? 1 : 0;
+            product.RejectionReason = RejectionReason;
 
             //Links
             product.Links = CategoryLinks.Select(x => x.ToModel(AbstractTypeFactory<CategoryLink>.TryCreateInstance())).ToList();
@@ -249,6 +261,11 @@ namespace VirtoCommerce.CatalogModule.Data.Model
             Weight = product.Weight;
             WeightUnit = product.WeightUnit;
             Width = product.Width;
+
+            IsPendingApproval = product.IsPendingApproval;
+            IsApproved = product.IsApproved;
+            IsRejected = product.IsRejected;
+            RejectionReason = product.RejectionReason;
 
             StartDate = product.StartDate == default(DateTime) ? DateTime.UtcNow : product.StartDate;
 
@@ -343,6 +360,11 @@ namespace VirtoCommerce.CatalogModule.Data.Model
             target.ParentId = ParentId;
             target.StartDate = StartDate;
             target.EndDate = EndDate;
+
+            target.IsPendingApproval = IsPendingApproval;
+            target.IsApproved = IsApproved;
+            target.IsRejected = IsRejected;
+            target.RejectionReason = RejectionReason;
 
             #region Assets
             if (!Assets.IsNullCollection())

@@ -86,10 +86,12 @@
       <HintPath>..\..\vc-module-core\VirtoCommerce.Domain\bin\Release\VirtoCommerce.Domain.dll</HintPath>
     </Reference>
     <Reference Include="VirtoCommerce.Platform.Core, Version=2.13.37.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\VirtoCommerce.Platform.Core.2.13.37\lib\net461\VirtoCommerce.Platform.Core.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\vc-platform\VirtoCommerce.Platform.Web\bin\VirtoCommerce.Platform.Core.dll</HintPath>
     </Reference>
     <Reference Include="VirtoCommerce.Platform.Data, Version=2.13.37.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\VirtoCommerce.Platform.Data.2.13.37\lib\net461\VirtoCommerce.Platform.Data.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\vc-platform\VirtoCommerce.Platform.Web\bin\VirtoCommerce.Platform.Data.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -205,6 +207,14 @@
     <Compile Include="Migrations\201812131122560_CatalogPropertyDictionaryItemSortOrder.cs" />
     <Compile Include="Migrations\201812131122560_CatalogPropertyDictionaryItemSortOrder.Designer.cs">
       <DependentUpon>201812131122560_CatalogPropertyDictionaryItemSortOrder.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201905120703374_AddItemApprovalMembers.cs" />
+    <Compile Include="Migrations\201905120703374_AddItemApprovalMembers.Designer.cs">
+      <DependentUpon>201905120703374_AddItemApprovalMembers.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201905121620218_AddItemIsRejected.cs" />
+    <Compile Include="Migrations\201905121620218_AddItemIsRejected.Designer.cs">
+      <DependentUpon>201905121620218_AddItemIsRejected.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Model\AssetEntity.cs" />
@@ -365,6 +375,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201812131122560_CatalogPropertyDictionaryItemSortOrder.resx">
       <DependentUpon>201812131122560_CatalogPropertyDictionaryItemSortOrder.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201905120703374_AddItemApprovalMembers.resx">
+      <DependentUpon>201905120703374_AddItemApprovalMembers.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201905121620218_AddItemIsRejected.resx">
+      <DependentUpon>201905121620218_AddItemIsRejected.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

@@ -303,6 +303,13 @@ namespace VirtoCommerce.CatalogModule.Web.Model
 
         public string[] SecurityScopes { get; set; }
 
+        public bool IsPendingApproval { get; set; }
+        public bool IsApproved { get; set; }
+        public bool IsRejected { get; set; }
+        public int PendingApprovalCount { get; set; }
+        public int RejectedCount { get; set; }
+        public string RejectionReason { get; set; }
+
         #region ISeoSupport Members 
         public string SeoObjectType { get { return GetType().Name; } }
         /// <summary>

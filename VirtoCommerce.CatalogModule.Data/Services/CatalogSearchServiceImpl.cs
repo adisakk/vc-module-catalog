@@ -57,6 +57,8 @@ namespace VirtoCommerce.CatalogModule.Data.Services
 
             Task.WaitAll(taskList.ToArray());
 
+            SetPendingApproval(retVal, criteria.CreatedBy);
+
             return retVal;
         }
 
@@ -192,6 +194,99 @@ namespace VirtoCommerce.CatalogModule.Data.Services
             }
         }
 
+        private void SetPendingApproval(SearchResult result, string productOwner)
+        {
+            var taskList = new List<Task>();
+            
+            if (!result.Catalogs.IsNullOrEmpty())
+            {
+                foreach (var catalog in result.Catalogs)
+                {
+                    taskList.Add(Task.Factory.StartNew(() => SetPendingApprovalForCatalog(catalog, productOwner)));
+                }
+            }
+
+            if (!result.Categories.IsNullOrEmpty())
+            {
+                foreach (var category in result.Categories)
+                {
+                    taskList.Add(Task.Factory.StartNew(() => SetPendingApprovalForCategory(category, productOwner)));
+                }
+            }
+
+            Task.WaitAll(taskList.ToArray());
+        }
+
+        protected void SetPendingApprovalForCatalog(Catalog catalog, string productOwner)
+        {
+            if (catalog == null)
+            {
+                throw new ArgumentNullException(nameof(catalog));
+            }
+
+            using (var repository = _catalogRepositoryFactory())
+            {
+                //Optimize performance and CPU usage
+                repository.DisableChangesTracking();
+                var query = repository.Items.Where(x => catalog.Id == x.CatalogId);
+                if(productOwner != null)
+                {
+                    query = query.Where(x => x.CreatedBy == productOwner);
+                }
+                catalog.PendingApprovalCount = query.Count(x => x.IsPendingApproval == true);
+            }
+        }
+
+        protected void SetPendingApprovalForCategory(Category category, string productOwner)
+        {
+            if (category == null)
+            {
+                throw new ArgumentNullException(nameof(category));
+            }
+
+            using (var repository = _catalogRepositoryFactory())
+            {
+                //Optimize performance and CPU usage
+                repository.DisableChangesTracking();
+                var query = repository.Items.Where(x => x.CategoryId == category.Id);
+                if (productOwner != null)
+                {
+                    query = query.Where(x => x.CreatedBy == productOwner);
+                }
+                category.PendingApprovalCount = query.Count(x => x.IsPendingApproval == true);
+
+                //Sub category
+                var subCategories = repository.Categories.Where(x => x.ParentCategoryId == category.Id);
+                foreach (var subCategory in subCategories)
+                {
+                    CountPendingApprovalInSubCategory(category, subCategory, productOwner);
+                }
+
+            }
+        }
+
+        protected void CountPendingApprovalInSubCategory(Category category, CategoryEntity subCategory, string productOwner)
+        {
+            using (var repository = _catalogRepositoryFactory())
+            {
+                //Optimize performance and CPU usage
+                repository.DisableChangesTracking();
+                var query = repository.Items.Where(x => x.CategoryId == subCategory.Id);
+                if (productOwner != null)
+                {
+                    query = query.Where(x => x.CreatedBy == productOwner);
+                }
+                category.PendingApprovalCount += query.Count(x => x.IsPendingApproval == true);
+
+                //Loop into sub child
+                var childCategories = repository.Categories.Where(x => x.ParentCategoryId == subCategory.Id);
+                foreach (var childCategory in childCategories)
+                {
+                    CountPendingApprovalInSubCategory(category, childCategory, productOwner);
+                }
+            }
+        }
+
         protected virtual void SearchItems(SearchCriteria criteria, SearchResult result)
         {
             var sortInfos = criteria.SortInfos;
@@ -231,7 +326,7 @@ namespace VirtoCommerce.CatalogModule.Data.Services
                 // Build the query based on the search criteria
                 var query = BuildSearchQuery(repository.Items, criteria, searchCategoryIds);
 
-                // Filter by creator name for only owner can see their product
+                // Filter by product owner
                 if (criteria.CreatedBy != null)
                 {
                     query = query.Where(x => x.CreatedBy == criteria.CreatedBy);

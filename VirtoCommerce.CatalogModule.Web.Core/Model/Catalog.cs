@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using VirtoCommerce.Platform.Core.Common;
 
@@ -56,5 +56,8 @@ namespace VirtoCommerce.CatalogModule.Web.Model
 		public List<Property> Properties { get; set; }
 
         public string[] SecurityScopes { get; set; }
+
+        public int PendingApprovalCount { get; set; }
+        public int RejectedCount { get; set; }
     }
 }

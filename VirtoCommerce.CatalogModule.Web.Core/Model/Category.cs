@@ -121,6 +121,9 @@ namespace VirtoCommerce.CatalogModule.Web.Model
         /// </value>
         public ICollection<Image> Images { get; set; }
 
+        public int PendingApprovalCount { get; set; }
+        public int RejectedCount { get; set; }
+
         public string[] SecurityScopes { get; set; }
 
         #region ISeoSupport Members 

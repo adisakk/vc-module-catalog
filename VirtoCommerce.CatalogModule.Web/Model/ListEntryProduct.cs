@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 
 namespace VirtoCommerce.CatalogModule.Web.Model
 {
@@ -19,6 +19,8 @@ namespace VirtoCommerce.CatalogModule.Web.Model
             Code = product.Code;
             Name = product.Name;
             IsActive = product.IsActive ?? true;
+            PendingApprovalCount = product.PendingApprovalCount;
+            RejectedCount = product.RejectedCount;
 
             if (!string.IsNullOrEmpty(product.Outline))
             {

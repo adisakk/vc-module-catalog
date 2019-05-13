@@ -1,5 +1,5 @@
-﻿angular.module('virtoCommerce.catalogModule')
-    .controller('virtoCommerce.catalogModule.itemDetailController', ['$rootScope', '$scope', 'platformWebApp.bladeNavigationService', 'platformWebApp.settings', 'virtoCommerce.catalogModule.items', 'virtoCommerce.customerModule.members', 'virtoCommerce.catalogModule.catalogs', 'platformWebApp.metaFormsService', 'virtoCommerce.catalogModule.categories', function ($rootScope, $scope, bladeNavigationService, settings, items, members, catalogs, metaFormsService, categories) {
+angular.module('virtoCommerce.catalogModule')
+    .controller('virtoCommerce.catalogModule.itemDetailController', ['$rootScope', '$scope', 'platformWebApp.bladeNavigationService', 'platformWebApp.settings', 'virtoCommerce.catalogModule.items', 'virtoCommerce.customerModule.members', 'virtoCommerce.catalogModule.catalogs', 'platformWebApp.metaFormsService', 'virtoCommerce.catalogModule.categories', 'platformWebApp.authService', function ($rootScope, $scope, bladeNavigationService, settings, items, members, catalogs, metaFormsService, categories, authSe5rvice) {
     var blade = $scope.blade;
     blade.updatePermission = 'catalog:update';
     blade.currentEntityId = blade.itemId;
@@ -17,6 +17,12 @@
             blade.itemId = data.id;
             blade.title = data.code;
             blade.securityScopes = data.securityScopes;
+
+            blade.hasApprovePermission = false;
+            if (authService.checkPermission('catalog:approve', blade.securityScopes)) {
+                blade.hasApprovePermission = true;
+            }
+
             if (!data.productType) {
                 data.productType = 'Physical';
             }
@@ -61,6 +67,14 @@
 
     function saveChanges() {
         blade.isLoading = true;
+
+        if (blade.item.isApproved || blade.item.isRejected) {
+            blade.item.isPendingApproval = false;
+        }
+
+        if (!blade.item.isApproved && !blade.item.isRejected) {
+            blade.item.isPendingApproval = true;
+        }
 
         var linkWithPriority = getLinkWithPriority(blade.item);
         if (linkWithPriority) {

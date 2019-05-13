@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Net;
 using System.Web.Http;
 using System.Web.Http.Description;
@@ -43,7 +43,6 @@ namespace VirtoCommerce.CatalogModule.Web.Controllers.Api
             };
 
             ApplyRestrictionsForCurrentUser(criteria);
-
             var serviceResult = _searchService.Search(criteria);
             var retVal = new List<webModel.Catalog>();
 

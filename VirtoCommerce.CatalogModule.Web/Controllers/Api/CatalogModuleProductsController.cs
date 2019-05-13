@@ -163,6 +163,7 @@ namespace VirtoCommerce.CatalogModule.Web.Controllers.Api
 
 
             retVal.Code = _skuGenerator.GenerateSku(retVal.ToModuleModel(null));
+            retVal.IsPendingApproval = true;
 
             return Ok(retVal);
         }
@@ -247,6 +248,11 @@ namespace VirtoCommerce.CatalogModule.Web.Controllers.Api
                 }
             }
 
+            // Set approval status to pending
+            result.IsPendingApproval = true;
+            result.IsApproved = false;
+            result.IsRejected = false;
+
             return Ok(result);
         }
 
@@ -322,6 +328,7 @@ namespace VirtoCommerce.CatalogModule.Web.Controllers.Api
             foreach (var product in products)
             {
                 var moduleProduct = product.ToModuleModel(_blobUrlResolver);
+                
                 if (moduleProduct.IsTransient())
                 {
                     if (moduleProduct.SeoInfos == null || !moduleProduct.SeoInfos.Any())
@@ -341,10 +348,20 @@ namespace VirtoCommerce.CatalogModule.Web.Controllers.Api
                     }
 
                     CheckCurrentUserHasPermissionForObjects(CatalogPredefinedPermissions.Create, moduleProduct);
+                    // Check approve for new product permission
+                    if (product.IsApproved)
+                    {
+                        CheckCurrentUserHasPermissionForObjects("catalog:approve", moduleProduct);
+                    }
                     toCreateList.Add(moduleProduct);
                 }
                 else
                 {
+                    var origProduct = _itemsService.GetById(product.Id, coreModel.ItemResponseGroup.ItemSmall);
+                    if(origProduct.IsApproved != product.IsApproved)
+                    {
+                        CheckCurrentUserHasPermissionForObjects("catalog:approve", moduleProduct);
+                    }
                     CheckCurrentUserHasPermissionForObjects(CatalogPredefinedPermissions.Update, moduleProduct);
                     toUpdateList.Add(moduleProduct);
                 }

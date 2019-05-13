@@ -54,9 +54,11 @@
 </script>
 <script type="text/ng-template" id="item-list-icon.cell.html">
     <div class="ui-grid-cell-contents">
-        <div class="product-img">
-            <img class="image" fallback-src="{{ COL_FIELD }}" ng-src="{{ COL_FIELD | thumbnail: '_64x64' }}" ng-if="row.entity.type !== 'category' && COL_FIELD">
-            <i class="table-ico fa" ng-class="row.entity.type == 'category' ? 'fa-folder' : 'fa-image'" ng-if="row.entity.type ==='category' || !COL_FIELD"></i>
+        <div ng-class="row.entity.pendingApprovalCount > 0 ? 'fa-stack fa-2x has-badge' : 'inner-contents'" data-count="{{row.entity.pendingApprovalCount}}">
+            <div class="product-img">
+                <img class="image" fallback-src="{{ COL_FIELD }}" ng-src="{{ COL_FIELD | thumbnail: '_64x64' }}" ng-if="row.entity.type !== 'category' && COL_FIELD">
+                <i class="table-ico fa" ng-class="row.entity.type == 'category' ? 'fa-folder' : 'fa-image'" ng-if="row.entity.type ==='category' || !COL_FIELD"></i>
+            </div>
         </div>
     </div>
 </script>

@@ -37,7 +37,7 @@ namespace VirtoCommerce.CatalogModule.Web.Security
                 }
 
             }
-
+            
             // Apply filter for BP user
             if (!securityService.isAdministrator(userName))
             {
