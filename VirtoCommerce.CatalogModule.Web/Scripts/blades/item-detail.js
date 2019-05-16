@@ -1,5 +1,5 @@
 angular.module('virtoCommerce.catalogModule')
-    .controller('virtoCommerce.catalogModule.itemDetailController', ['$rootScope', '$scope', 'platformWebApp.bladeNavigationService', 'platformWebApp.settings', 'virtoCommerce.catalogModule.items', 'virtoCommerce.customerModule.members', 'virtoCommerce.catalogModule.catalogs', 'platformWebApp.metaFormsService', 'virtoCommerce.catalogModule.categories', 'platformWebApp.authService', function ($rootScope, $scope, bladeNavigationService, settings, items, members, catalogs, metaFormsService, categories, authSe5rvice) {
+    .controller('virtoCommerce.catalogModule.itemDetailController', ['$rootScope', '$scope', 'platformWebApp.bladeNavigationService', 'platformWebApp.settings', 'virtoCommerce.catalogModule.items', 'virtoCommerce.customerModule.members', 'virtoCommerce.catalogModule.catalogs', 'platformWebApp.metaFormsService', 'virtoCommerce.catalogModule.categories', 'platformWebApp.authService', function ($rootScope, $scope, bladeNavigationService, settings, items, members, catalogs, metaFormsService, categories, authService) {
     var blade = $scope.blade;
     blade.updatePermission = 'catalog:update';
     blade.currentEntityId = blade.itemId;
