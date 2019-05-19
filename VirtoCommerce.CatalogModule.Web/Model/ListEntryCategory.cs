@@ -16,6 +16,7 @@ namespace VirtoCommerce.CatalogModule.Web.Model
             Code = category.Code;
             Name = category.Name;
             IsActive = category.IsActive;
+            CatalogId = category.CatalogId;
             PendingApprovalCount = category.PendingApprovalCount;
             RejectedCount = category.RejectedCount;
 

@@ -83,6 +83,11 @@ namespace VirtoCommerce.CatalogModule.Web.Model
         /// </summary>
         public string[] Path { get; set; }
 
+        /// <summary>
+        /// Gets or sets the catalog id.
+        /// </summary>
+        public string CatalogId { get; set; }
+
         public int PendingApprovalCount { get; set; }
         public int RejectedCount { get; set; }
     }

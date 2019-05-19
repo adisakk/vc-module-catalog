@@ -52,7 +52,7 @@ angular.module('virtoCommerce.catalogModule')
 
 
     blade.codeValidator = function (value) {
-        var pattern = /[$+;=%{}[\]|\\\/@ ~!^*&()?:'<>,]/;
+        var pattern = /[$+;=%{}[\]|@~!^*&()?'<>,]/;
         return !pattern.test(value);
     };
 
