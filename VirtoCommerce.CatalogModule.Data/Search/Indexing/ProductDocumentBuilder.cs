@@ -52,6 +52,9 @@ namespace VirtoCommerce.CatalogModule.Data.Search.Indexing
             IndexIsProperty(document, "product");
             IndexIsProperty(document, product.Code);
 
+            // Add filter isApproved to show only approved products on storefront
+            document.Add(new IndexDocumentField("isapproved", product.IsApproved) { IsRetrievable = false, IsFilterable = true });
+
             document.Add(new IndexDocumentField("status", statusField) { IsRetrievable = true, IsFilterable = true });
             document.Add(new IndexDocumentField("code", product.Code) { IsRetrievable = true, IsFilterable = true, IsCollection = true });
             document.Add(new IndexDocumentField("name", product.Name) { IsRetrievable = true, IsFilterable = true });

@@ -144,6 +144,9 @@ namespace VirtoCommerce.CatalogModule.Data.Search
 
             result.Add(FiltersHelper.CreateDateRangeFilter("startdate", criteria.StartDateFrom, criteria.StartDate, false, true));
 
+            //product approval filter
+            result.Add(FiltersHelper.CreateTermFilter("isapproved", "true"));
+
             if (criteria.EndDate != null)
             {
                 result.Add(FiltersHelper.CreateDateRangeFilter("enddate", criteria.EndDate, null, false, false));
