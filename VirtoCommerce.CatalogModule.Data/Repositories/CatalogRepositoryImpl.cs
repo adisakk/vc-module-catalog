@@ -335,6 +335,18 @@ namespace VirtoCommerce.CatalogModule.Data.Repositories
             return result;
         }
 
+        public dataModel.ItemEntity[] GetItemByCodes(string[] itemCodes)
+        {
+            var result = Array.Empty<dataModel.ItemEntity>();
+
+            if (!itemCodes.IsNullOrEmpty())
+            {
+                result = Items.Include(x => x.Images).Where(x => itemCodes.Contains(x.Code)).ToArray();
+            }
+
+            return result;
+        }
+
         public dataModel.PropertyEntity[] GetPropertiesByIds(string[] propIds, bool loadDictValues = false)
         {
             var result = Array.Empty<dataModel.PropertyEntity>();

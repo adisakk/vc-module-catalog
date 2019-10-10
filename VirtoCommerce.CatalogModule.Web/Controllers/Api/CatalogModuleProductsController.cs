@@ -66,6 +66,30 @@ namespace VirtoCommerce.CatalogModule.Web.Controllers.Api
         }
 
         /// <summary>
+        /// Gets product by SKU.
+        /// </summary>
+        /// <param name="code">Item SKU.</param>
+        ///<param name="respGroup">Response group.</param>
+        [HttpGet]
+        [Route("code/{code}")]
+        [ResponseType(typeof(webModel.Product))]
+        public IHttpActionResult GetProductByCode(string code, [FromUri] coreModel.ItemResponseGroup respGroup = coreModel.ItemResponseGroup.ItemLarge)
+        {
+            var item = _itemsService.GetByCode(code, respGroup);
+            if (item == null)
+            {
+                return NotFound();
+            }
+
+            CheckCurrentUserHasPermissionForObjects(CatalogPredefinedPermissions.Read, item);
+
+            var retVal = item.ToWebModel(_blobUrlResolver);
+
+            retVal.SecurityScopes = GetObjectPermissionScopeStrings(item);
+            return Ok(retVal);
+        }
+
+        /// <summary>
         /// Gets products by ids
         /// </summary>
         /// <param name="ids">Item ids</param>

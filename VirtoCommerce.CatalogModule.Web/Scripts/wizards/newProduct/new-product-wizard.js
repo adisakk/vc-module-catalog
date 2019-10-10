@@ -1,5 +1,5 @@
 angular.module('virtoCommerce.catalogModule')
-    .controller('virtoCommerce.catalogModule.newProductWizardController', ['$scope', 'platformWebApp.bladeNavigationService', '$http', 'virtoCommerce.storeModule.stores', 'virtoCommerce.catalogModule.catalogImagesFolderPathHelper', function ($scope, bladeNavigationService, $http, stores, catalogImgHelper) {
+    .controller('virtoCommerce.catalogModule.newProductWizardController', ['$scope', 'platformWebApp.bladeNavigationService', '$http', 'virtoCommerce.storeModule.stores', 'virtoCommerce.catalogModule.catalogImagesFolderPathHelper', 'virtoCommerce.catalogModule.items', function ($scope, bladeNavigationService, $http, stores, catalogImgHelper, items) {
     var blade = $scope.blade;
     blade.headIcon = blade.item.productType === 'Digital' ? 'fa fa-file-archive-o' : 'fa fa-truck';
 
@@ -10,23 +10,38 @@ angular.module('virtoCommerce.catalogModule')
     $scope.createItem = function () {
         blade.isLoading = true;
 
-        blade.item.$update(null,
-            function (dbItem) {
-                blade.parentBlade.setSelectedItem(dbItem);
-                blade.parentBlade.refresh();
+        // Check SKU duplication before create an item
+        items.getByCode({ code: blade.item.code },
+            function (item) {
+                if (item.id == blade.item.code) {
 
-                var newBlade = {
-                    id: blade.id,
-                    itemId: dbItem.id,
-                    catalog: blade.catalog,
-                    productType: dbItem.productType,
-                    title: dbItem.name,
-                    controller: 'virtoCommerce.catalogModule.itemDetailController',
-                    template: 'Modules/$(VirtoCommerce.Catalog)/Scripts/blades/item-detail.tpl.html'
-                };
-                bladeNavigationService.showBlade(newBlade, blade.parentBlade);
+                    blade.item.$update(null,
+                        function (dbItem) {
+                            blade.parentBlade.setSelectedItem(dbItem);
+                            blade.parentBlade.refresh();
+
+                            var newBlade = {
+                                id: blade.id,
+                                itemId: dbItem.id,
+                                catalog: blade.catalog,
+                                productType: dbItem.productType,
+                                title: dbItem.name,
+                                controller: 'virtoCommerce.catalogModule.itemDetailController',
+                                template: 'Modules/$(VirtoCommerce.Catalog)/Scripts/blades/item-detail.tpl.html'
+                            };
+                            bladeNavigationService.showBlade(newBlade, blade.parentBlade);
+                        },
+                        function (error) { bladeNavigationService.setError('Error ' + error.status, $scope.blade); });
+                } else {
+                    bladeNavigationService.setError('Error - SKU already taken.', $scope.blade);
+                }
             },
-            function (error) { bladeNavigationService.setError('Error ' + error.status, $scope.blade); });
+            function (error) {
+                bladeNavigationService.setError('Error ' + error.status, blade);
+            }
+        );
+
+        
     };
 
     $scope.openBlade = function (type) {

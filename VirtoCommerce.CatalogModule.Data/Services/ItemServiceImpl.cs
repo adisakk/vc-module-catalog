@@ -105,6 +105,39 @@ namespace VirtoCommerce.CatalogModule.Data.Services
             return result;
         }
 
+        public virtual CatalogProduct GetByCode(string itemCode, ItemResponseGroup respGroup, string catalogId = null)
+        {
+            CatalogProduct result = null;
+
+            if (!string.IsNullOrEmpty(itemCode))
+            {
+                var results = GetByCodes(new[] { itemCode }, respGroup, catalogId);
+                result = results.Any() ? results.First() : null;
+            }
+
+            return result;
+        }
+
+        public virtual CatalogProduct[] GetByCodes(string[] itemCodes, ItemResponseGroup respGroup, string catalogId = null)
+        {
+            var result = Array.Empty<CatalogProduct>();
+
+            if (!itemCodes.IsNullOrEmpty())
+            {
+                using (var repository = _repositoryFactory())
+                {
+                    //Optimize performance and CPU usage
+                    repository.DisableChangesTracking();
+
+                    result = repository.GetItemByCodes(itemCodes)
+                        .Select(x => x.ToModel(AbstractTypeFactory<CatalogProduct>.TryCreateInstance()))
+                                       .ToArray();
+                }
+            }
+
+            return result;
+        }
+
         public virtual void Create(CatalogProduct[] items)
         {
             SaveChanges(items);
