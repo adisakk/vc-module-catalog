@@ -78,7 +78,7 @@ namespace VirtoCommerce.CatalogModule.Web.Controllers.Api
             var item = _itemsService.GetByCode(code, respGroup);
             if (item == null)
             {
-                return NotFound();
+                return Ok();
             }
 
             CheckCurrentUserHasPermissionForObjects(CatalogPredefinedPermissions.Read, item);

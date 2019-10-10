@@ -12,8 +12,8 @@ angular.module('virtoCommerce.catalogModule')
 
         // Check SKU duplication before create an item
         items.getByCode({ code: blade.item.code },
-            function (item) {
-                if (item.id == blade.item.code) {
+            function (result) {
+                if (result.code != blade.item.code) {
 
                     blade.item.$update(null,
                         function (dbItem) {
