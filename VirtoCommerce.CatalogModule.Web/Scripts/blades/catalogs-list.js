@@ -132,7 +132,8 @@ angular.module('virtoCommerce.catalogModule')
     }
     ];
 
-    if (authService.checkPermission('catalog:create')) {
+    //if (authService.checkPermission('catalog:create')) {
+    if (authService.checkPermission('catalog:manage')) {
         blade.toolbarCommands.splice(1, 0, {
             name: "platform.commands.add",
             icon: 'fa fa-plus',

@@ -1,9 +1,11 @@
 angular.module('virtoCommerce.catalogModule')
-    .controller('virtoCommerce.catalogModule.categoriesItemsAddController', ['$scope', 'platformWebApp.bladeNavigationService', 'virtoCommerce.catalogModule.categories', 'virtoCommerce.catalogModule.items', 'virtoCommerce.catalogModule.itemTypesResolverService', function ($scope, bladeNavigationService, categories, items, itemTypesResolverService) {
+    .controller('virtoCommerce.catalogModule.categoriesItemsAddController', ['$scope', 'platformWebApp.bladeNavigationService', 'virtoCommerce.catalogModule.categories', 'virtoCommerce.catalogModule.items', 'virtoCommerce.catalogModule.itemTypesResolverService', 'platformWebApp.authService', function ($scope, bladeNavigationService, categories, items, itemTypesResolverService, authService) {
         var blade = $scope.blade;
         var pb = blade.parentBlade;
 
         $scope.availableTypes = itemTypesResolverService.objects;
+
+        $scope.hasManagePermission = authService.checkPermission('catalog:manager');
 
         $scope.addCategory = function () {
             categories.newCategory({ catalogId: pb.catalogId, parentCategoryId: pb.categoryId },

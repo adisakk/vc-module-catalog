@@ -130,6 +130,7 @@
             <permission id="catalog:BrowseFilters:Read" name="Read Browse Filters" description=""/>
             <permission id="catalog:BrowseFilters:Update" name="Update Browse Filters" description=""/>
             <permission id="catalog:approve" name="Approve product in catalog" description=""/>
+            <permission id="catalog:manage" name="Admin manage catalog related data" description=""/>
         </group>
     </permissions>
 </module>

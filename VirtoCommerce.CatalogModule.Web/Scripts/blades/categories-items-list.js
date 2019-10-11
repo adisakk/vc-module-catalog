@@ -1,10 +1,12 @@
 angular.module('virtoCommerce.catalogModule')
     .controller('virtoCommerce.catalogModule.categoriesItemsListController', [
-        '$sessionStorage', '$localStorage', '$timeout', '$scope',  'virtoCommerce.catalogModule.categories', 'virtoCommerce.catalogModule.items', 'virtoCommerce.catalogModule.listEntries', 'platformWebApp.bladeUtils', 'platformWebApp.dialogService', 'platformWebApp.authService', 'platformWebApp.uiGridHelper', 'virtoCommerce.catalogModule.catalogs',
+        '$sessionStorage', '$localStorage', '$timeout', '$scope', 'virtoCommerce.catalogModule.categories', 'virtoCommerce.catalogModule.items', 'virtoCommerce.catalogModule.listEntries', 'platformWebApp.bladeUtils', 'platformWebApp.dialogService', 'platformWebApp.authService', 'platformWebApp.uiGridHelper', 'virtoCommerce.catalogModule.catalogs',
         function ($sessionStorage, $localStorage, $timeout, $scope, categories, items, listEntries, bladeUtils, dialogService, authService, uiGridHelper, catalogs) {
             $scope.uiGridConstants = uiGridHelper.uiGridConstants;
             $scope.hasMore = true;
             $scope.items = [];
+
+            $scope.hasManagePermission = authService.checkPermission('catalog:manager');
 
             var blade = $scope.blade;
             var bladeNavigationService = bladeUtils.bladeNavigationService;
@@ -12,8 +14,10 @@ angular.module('virtoCommerce.catalogModule')
                 blade.catalog = catalogs.get({ id: blade.catalogId });
 
             blade.refresh = function () {
-  
+
                 blade.isLoading = true;
+
+                $scope.hasManagePermission = authService.checkPermission('catalog:manager');
 
                 if ($scope.pageSettings.currentPage !== 1)
                     $scope.pageSettings.currentPage = 1;
@@ -69,8 +73,7 @@ angular.module('virtoCommerce.catalogModule')
             }
 
             // Search Criteria
-            function getSearchCriteria()
-            {
+            function getSearchCriteria() {
                 var searchCriteria = {
                     catalogId: blade.catalogId,
                     categoryId: blade.categoryId,
@@ -115,7 +118,7 @@ angular.module('virtoCommerce.catalogModule')
                         function () {
                             blade.disableOpenAnimation = true;
                             bladeNavigationService.showBlade(blade, blade.parentBlade);
-                           // blade.refresh();
+                            // blade.refresh();
                         });
                 };
             }
@@ -132,8 +135,14 @@ angular.module('virtoCommerce.catalogModule')
 
             $scope.edit = function (listItem) {
                 if (listItem.type === 'category') {
-                    blade.setSelectedItem(listItem);
-                    blade.showCategoryBlade(listItem);
+
+                    if (authService.checkPermission('catalog:manage')) {
+                        blade.setSelectedItem(listItem);
+                        blade.showCategoryBlade(listItem);
+                    } else {
+                        console.log('You dont have permission catalog:manage');
+                    }
+
                 } else
                     $scope.selectItem(null, listItem);
             };
@@ -156,86 +165,105 @@ angular.module('virtoCommerce.catalogModule')
             }
 
             function cutList(selection) {
-                $sessionStorage.catalogClipboardContent = selection;
+                if (checkPermission(selection)) {
+                    $sessionStorage.catalogClipboardContent = selection;
+                }
             }
 
             $scope.delete = function (data) {
                 deleteList([data]);
             };
 
+            function checkPermission(selection) {
+                var categorySelected = false;
+                for (var c = 0; c < selection.length; c++) {
+                    if (selection[c].type == 'category') {
+                        categorySelected = true;
+                        break;
+                    }
+                }
+                if (categorySelected && !authService.checkPermission('catalog:manage')) {
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+
             function isItemsChecked() {
                 return $scope.gridApi && _.any($scope.gridApi.selection.getSelectedRows());
             }
 
             function deleteList(selection) {
-                var listEntryLinks = [];
-                var categoryIds = [];
-                var itemIds = [];
-                angular.forEach(selection, function (listItem) {
-                    var deletingLink = false;
+                if (checkPermission(selection)) {
+                    var listEntryLinks = [];
+                    var categoryIds = [];
+                    var itemIds = [];
+                    angular.forEach(selection, function (listItem) {
+                        var deletingLink = false;
 
-                    if (listItem.type === 'category') {
-                        if (blade.catalog && blade.catalog.isVirtual
-                            && _.some(listItem.links, function (x) { return x.categoryId === blade.categoryId; })) {
-                            deletingLink = true;
+                        if (listItem.type === 'category') {
+                            if (blade.catalog && blade.catalog.isVirtual
+                                && _.some(listItem.links, function (x) { return x.categoryId === blade.categoryId; })) {
+                                deletingLink = true;
+                            } else {
+                                categoryIds.push(listItem.id);
+                            }
                         } else {
-                            categoryIds.push(listItem.id);
+                            if (blade.catalog && blade.catalog.isVirtual) {
+                                deletingLink = true;
+                            } else {
+                                itemIds.push(listItem.id);
+                            }
                         }
-                    } else {
-                        if (blade.catalog && blade.catalog.isVirtual) {
-                            deletingLink = true;
-                        } else {
-                            itemIds.push(listItem.id);
+
+                        if (deletingLink)
+                            listEntryLinks.push({
+                                listEntryId: listItem.id,
+                                listEntryType: listItem.type,
+                                catalogId: blade.catalogId,
+                                categoryId: blade.categoryId,
+                            });
+                    });
+
+                    var listCategoryLinkCount = _.where(listEntryLinks, { listEntryType: 'category' }).length;
+                    var dialog = {
+                        id: "confirmDeleteItem",
+                        categoryCount: categoryIds.length,
+                        itemCount: itemIds.length,
+                        listCategoryLinkCount: listCategoryLinkCount,
+                        listItemLinkCount: listEntryLinks.length - listCategoryLinkCount,
+                        callback: function (remove) {
+                            if (remove) {
+                                bladeNavigationService.closeChildrenBlades(blade);
+                                blade.isLoading = true;
+                                if (listEntryLinks.length > 0) {
+                                    listEntries.deletelinks(listEntryLinks, function (data, headers) {
+                                        blade.refresh();
+                                        if (blade.mode === 'mappingSource')
+                                            blade.parentBlade.refresh();
+                                    }, function (error) {
+                                        bladeNavigationService.setError('Error ' + error.status, blade);
+                                    });
+                                }
+                                if (categoryIds.length > 0) {
+                                    categories.remove({ ids: categoryIds }, function (data, headers) {
+                                        blade.refresh();
+                                    }, function (error) {
+                                        bladeNavigationService.setError('Error ' + error.status, blade);
+                                    });
+                                }
+                                if (itemIds.length > 0) {
+                                    items.remove({ ids: itemIds }, function (data, headers) {
+                                        blade.refresh();
+                                    }, function (error) {
+                                        bladeNavigationService.setError('Error ' + error.status, blade);
+                                    });
+                                }
+                            }
                         }
                     }
-
-                    if (deletingLink)
-                        listEntryLinks.push({
-                            listEntryId: listItem.id,
-                            listEntryType: listItem.type,
-                            catalogId: blade.catalogId,
-                            categoryId: blade.categoryId,
-                        });
-                });
-
-                var listCategoryLinkCount = _.where(listEntryLinks, { listEntryType: 'category' }).length;
-                var dialog = {
-                    id: "confirmDeleteItem",
-                    categoryCount: categoryIds.length,
-                    itemCount: itemIds.length,
-                    listCategoryLinkCount: listCategoryLinkCount,
-                    listItemLinkCount: listEntryLinks.length - listCategoryLinkCount,
-                    callback: function (remove) {
-                        if (remove) {
-                            bladeNavigationService.closeChildrenBlades(blade);
-                            blade.isLoading = true;
-                            if (listEntryLinks.length > 0) {
-                                listEntries.deletelinks(listEntryLinks, function (data, headers) {
-                                    blade.refresh();
-                                    if (blade.mode === 'mappingSource')
-                                        blade.parentBlade.refresh();
-                                }, function (error) {
-                                    bladeNavigationService.setError('Error ' + error.status, blade);
-                                });
-                            }
-                            if (categoryIds.length > 0) {
-                                categories.remove({ ids: categoryIds }, function (data, headers) {
-                                    blade.refresh();
-                                }, function (error) {
-                                    bladeNavigationService.setError('Error ' + error.status, blade);
-                                });
-                            }
-                            if (itemIds.length > 0) {
-                                items.remove({ ids: itemIds }, function (data, headers) {
-                                    blade.refresh();
-                                }, function (error) {
-                                    bladeNavigationService.setError('Error ' + error.status, blade);
-                                });
-                            }
-                        }
-                    }
+                    dialogService.showDialog(dialog, 'Modules/$(VirtoCommerce.Catalog)/Scripts/dialogs/deleteCategoryItem-dialog.tpl.html', 'platformWebApp.confirmDialogController');
                 }
-                dialogService.showDialog(dialog, 'Modules/$(VirtoCommerce.Catalog)/Scripts/dialogs/deleteCategoryItem-dialog.tpl.html', 'platformWebApp.confirmDialogController');
             }
 
             function mapChecked() {
