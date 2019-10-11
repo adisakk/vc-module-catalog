@@ -5,8 +5,12 @@ angular.module('virtoCommerce.catalogModule')
     var blade = $scope.blade;
     var selectedNode = null;
 
+    $scope.hasManagePermission = authService.checkPermission('catalog:manage');
+
     blade.refresh = function () {
         blade.isLoading = true;
+
+        $scope.hasManagePermission = authService.checkPermission('catalog:manage');
 
         catalogs.getCatalogs({
             sort: uiGridHelper.getSortExpression($scope),
